@@ -4,20 +4,27 @@ use super::*;
 
 impl Scanner {
     pub fn scan_char(&mut self) -> CosmoResult<()> {
-        let c = self.advance();
-
-        let Some(c) = c else {
-            return Err(CosmoErr::Scan(ScanErr::NotFound {
-                at: self.pointers.line,
-                message: "Token was not found!".to_string(),
-            }));
-        };
+        let c = self.advance()?;
 
         match c {
-            '+' => self.add_token(TokenType::Plus),
+            '+' => {
+                if self.match_next('-') {
+                    self.add_token(TokenType::PlusMinus);
+                } else {
+                    self.add_token(TokenType::Plus)
+                }
+            }
             '-' => self.add_token(TokenType::Minus),
             '*' => self.add_token(TokenType::Asterisk),
             '/' => self.add_token(TokenType::Slash),
+            '±' => self.add_token(TokenType::PlusMinus),
+            '#' => {
+                while self.peek(0)? != '\n' && !self.is_at_end() {
+                    self.advance()?;
+                }
+            }
+            x if x.is_numeric() => self.numbers()?,
+            x if x.is_alphabetic() => self.keyword()?,
             ' ' | '\r' | '\t' | '\n' => {
                 if c == '\n' {
                     self.pointers.line += 1;

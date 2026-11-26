@@ -48,7 +48,7 @@ impl Scanner {
         return Ok(std::mem::take(&mut self.tokens));
     }
 
-    fn is_at_end(&self) -> bool {
+    pub(in crate::scanner) fn is_at_end(&self) -> bool {
         self.pointers.current >= self.source.len() as u32
     }
 
@@ -70,9 +70,46 @@ impl Scanner {
         self.tokens.push(Token::new(content));
     }
 
-    pub(in crate::scanner) fn advance(&mut self) -> Option<char> {
+    pub(in crate::scanner) fn advance(&mut self) -> CosmoResult<char> {
         let tok = self.source.get(self.pointers.current as usize);
         self.pointers.current += 1;
-        tok.map(|c| *c)
+
+        let Some(tok) = tok else {
+            return Err(CosmoErr::Scan(ScanErr::NotFound {
+                at: self.pointers.line,
+                message: "Token was not found!".to_string(),
+            }));
+        };
+
+        Ok(*tok)
+    }
+
+    pub(in crate::scanner) fn match_next(&mut self, expected: char) -> bool {
+        if self.is_at_end() || &self.source[self.pointers.current as usize] != &expected {
+            return false;
+        }
+
+        self.pointers.current += 1;
+        true
+    }
+
+    pub(in crate::scanner) fn peek(&self, n: u32) -> CosmoResult<char> {
+        let index = self.pointers.current + n;
+        let c = self.source.get(index as usize);
+
+        if n > 0 {
+            if self.pointers.current + n >= self.source.len() as u32 {
+                return Ok('\0');
+            }
+        }
+
+        let Some(c) = c else {
+            return Err(CosmoErr::Scan(ScanErr::NotFound {
+                at: self.pointers.line,
+                message: "Token was not found!".to_string(),
+            }));
+        };
+
+        Ok(*c)
     }
 }

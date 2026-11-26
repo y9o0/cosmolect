@@ -17,8 +17,14 @@ impl fmt::Display for CosmoErr {
 
 #[derive(Debug, thiserror::Error)]
 pub enum ScanErr {
-    #[error("at '{}' due to '{}'", at, message)]
+    #[error("at : '{}',and due to '{}'", at, message)]
     NotFound { at: u32, message: String },
-    #[error("at '{}' due to '{}' is unrecognized token!", at, token)]
+    #[error("at : '{}', and due to '{}' is unrecognized token!", at, token)]
     Unrecognized { at: u32, token: String },
+    #[error(
+        "at : '{}', and due to '{}' couldn't be parsed by the scanner!",
+        at,
+        txt
+    )]
+    Unconsumable { at: u32, txt: String },
 }

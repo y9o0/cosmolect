@@ -1,6 +1,7 @@
 use super::*;
 
 #[derive(Debug)]
+#[allow(warnings)]
 pub struct Token {
     lexeme: String,
     token_type: TokenType,
