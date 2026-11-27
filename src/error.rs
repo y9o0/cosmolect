@@ -5,12 +5,14 @@ pub type CosmoResult<T> = std::result::Result<T, CosmoErr>;
 #[derive(Debug, thiserror::Error)]
 pub enum CosmoErr {
     Scan(ScanErr),
+    Parse(ParseErr),
 }
 
 impl fmt::Display for CosmoErr {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Scan(x) => write!(f, "{}", x),
+            Self::Parse(x) => write!(f, "{}", x),
         }
     }
 }
@@ -27,4 +29,10 @@ pub enum ScanErr {
         txt
     )]
     Unconsumable { at: u32, txt: String },
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum ParseErr {
+    #[error("Unexpected : at -> '{}' due to -> '{}'", at, message)]
+    Unexpected { at: usize, message: String },
 }

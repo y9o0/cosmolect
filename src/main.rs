@@ -7,8 +7,11 @@ use std::{
 
 use scanner::core::Scanner;
 
+mod compiler;
 mod error;
+mod pratt;
 mod scanner;
+mod sema;
 
 fn main() -> std::io::Result<()> {
     let path = std::env::args().nth(1);

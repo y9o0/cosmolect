@@ -10,4 +10,6 @@ pub enum TokenType {
     Identifier,
 
     Eof,
+
+    Nai,
 }
