@@ -1,4 +1,6 @@
 mod hirexpr;
 mod lowexpr;
 
-pub use hirexpr::core::HirExpr;
+use crate::error::CosmoResult;
+use crate::scanner::TokenType;
+pub use {hirexpr::core::HirExpr, lowexpr::core::LowExpr};

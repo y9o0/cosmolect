@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub enum TokenType {
     Plus,      // +
     Minus,     // -
@@ -10,6 +10,7 @@ pub enum TokenType {
     Identifier,
 
     Eof,
+    NewLine, // \n
 
     Nai,
 }

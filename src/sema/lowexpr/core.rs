@@ -1,5 +1,11 @@
-use super::HirExpr;
+use super::*;
 
 pub enum LowExpr {
-    Number(HirExpr),
+    Number(f64),
+
+    Binary {
+        lhs: Box<LowExpr>,
+        op: TokenType,
+        rhs: Box<LowExpr>,
+    },
 }

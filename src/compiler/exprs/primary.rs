@@ -1,5 +1,3 @@
-use std::num::ParseFloatError;
-
 use super::*;
 
 impl Parser {

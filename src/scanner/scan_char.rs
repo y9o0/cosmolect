@@ -25,11 +25,11 @@ impl Scanner {
             }
             x if x.is_numeric() => self.numbers()?,
             x if x.is_alphabetic() => self.keyword()?,
-            ' ' | '\r' | '\t' | '\n' => {
-                if c == '\n' {
-                    self.pointers.line += 1;
-                }
+            '\n' => {
+                self.pointers.line += 1;
+                self.add_token(TokenType::NewLine)
             }
+            ' ' | '\r' | '\t' => {}
             _ => {
                 return Err(Scan(ScanErr::Unrecognized {
                     at: self.pointers.line,

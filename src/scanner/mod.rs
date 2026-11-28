@@ -7,5 +7,4 @@ use crate::error::{CosmoErr, CosmoResult, ScanErr};
 
 use core::Scanner;
 
-use tokens::r#type::TokenType;
-pub use tokens::{Token, TokenContent};
+pub use tokens::{Token, TokenContent, TokenType};

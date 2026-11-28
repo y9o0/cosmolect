@@ -5,8 +5,9 @@ use std::{
     path::Path,
 };
 
-use scanner::core::Scanner;
+use compiler::compile;
 
+mod codegen;
 mod compiler;
 mod error;
 mod pratt;
@@ -30,11 +31,7 @@ fn main() -> std::io::Result<()> {
         code = read_to_string(x)?;
     }
 
-    let s = Scanner::new(code).scan().unwrap();
-
-    for i in s {
-        println!("{:?}", i);
-    }
+    compile(&code).unwrap();
 
     Ok(())
 }

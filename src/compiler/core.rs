@@ -21,6 +21,40 @@ impl Pointers {
     }
 }
 
+pub fn compile(source: &str) -> CosmoResult<()> {
+    let scanner = Scanner::new(source.to_string()).scan()?;
+    let mut parser = Parser::new(scanner);
+
+    let mut hirexprs = Vec::new();
+    while parser.peek()?.token_type != TokenType::Eof {
+        let parsed = parser.parse(0)?;
+
+        if parser.peek()?.token_type == TokenType::NewLine && parsed != HirExpr::NewLine(()) {
+            hirexprs.push(parsed);
+        }
+    }
+
+    let mut lowered_exprs: Vec<LowExpr> = Vec::new();
+
+    for e in hirexprs {
+        let e = e.to_lower_expr()?;
+        lowered_exprs.push(e);
+    }
+
+    let mut generated = Vec::new();
+    for le in lowered_exprs {
+        let gen_e = le.generate()?;
+        generated.push(gen_e);
+    }
+
+    for i in generated {
+        let Gen::Number(n) = i;
+        println!("{}", n)
+    }
+
+    Ok(())
+}
+
 impl Parser {
     pub fn new(tokens: Vec<Token>) -> Self {
         Self {
@@ -37,11 +71,24 @@ impl Parser {
             }));
         };
 
-        self.pointers.current = std::mem::take(index);
         self.pointers.previous = std::mem::take(&mut self.pointers.current);
+        self.pointers.current = std::mem::take(index);
 
         self.pointers.line += 1;
 
         Ok(())
+    }
+
+    pub fn peek(&self) -> CosmoResult<&Token> {
+        let index = self.pointers.line;
+
+        let Some(tok) = self.tokens.get(index) else {
+            return Err(Parse(ParseErr::Unexpected {
+                at: self.pointers.line,
+                message: format!("Couldn't peek at {}", index),
+            }));
+        };
+
+        Ok(tok)
     }
 }

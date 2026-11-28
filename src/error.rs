@@ -1,11 +1,14 @@
 use std::fmt;
 
+use crate::scanner::TokenType;
 pub type CosmoResult<T> = std::result::Result<T, CosmoErr>;
 
 #[derive(Debug, thiserror::Error)]
 pub enum CosmoErr {
     Scan(ScanErr),
     Parse(ParseErr),
+    HirExpr(HirExprErr),
+    CodeGen(CodegenErr),
 }
 
 impl fmt::Display for CosmoErr {
@@ -13,6 +16,8 @@ impl fmt::Display for CosmoErr {
         match self {
             Self::Scan(x) => write!(f, "{}", x),
             Self::Parse(x) => write!(f, "{}", x),
+            Self::HirExpr(x) => write!(f, "{}", x),
+            Self::CodeGen(x) => write!(f, "{}", x),
         }
     }
 }
@@ -35,4 +40,18 @@ pub enum ScanErr {
 pub enum ParseErr {
     #[error("Unexpected : at -> '{}' due to -> '{}'", at, message)]
     Unexpected { at: usize, message: String },
+    #[error("BadToken : found at -> '{}' and was -> '{:?}'", at, token)]
+    BadToken { at: usize, token: TokenType },
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum HirExprErr {
+    #[error("Unexpected : due to '{}'", message)]
+    Unexpected { message: String },
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum CodegenErr {
+    #[error("BadToken : '{:?}'", token)]
+    BadToken { token: TokenType },
 }
